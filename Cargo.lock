@@ -1489,6 +1489,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "priority_fees"
+version = "0.1.0"
+dependencies = [
+ "log",
+ "serde",
+ "zela-std",
+]
+
+[[package]]
 name = "proc-macro-crate"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4766,7 +4775,7 @@ dependencies = [
 [[package]]
 name = "zela-std"
 version = "0.1.0"
-source = "git+https://github.com/Zela-xyz/zela-std.git?rev=e5465e0e60ae6b690664408dbdd885fcdb867eab#e5465e0e60ae6b690664408dbdd885fcdb867eab"
+source = "git+https://github.com/Zela-io/zela-std.git?rev=e5465e0e60ae6b690664408dbdd885fcdb867eab#e5465e0e60ae6b690664408dbdd885fcdb867eab"
 dependencies = [
  "base64 0.22.1",
  "bincode",
