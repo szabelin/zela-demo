@@ -163,10 +163,9 @@ mod zela {
 		// It will be called once for each incoming request.
 		async fn run(params: Self::Params) -> Result<Self::SuccessData, RpcError<Self::ErrorData>> {
 			let rpc = RpcClient::new();
-			let foo = bar; // making an error on purpose to fail the build
 
 			match Self::run(params, &rpc).await {
-				Ok(v) => Ok(v),
+				Ok(v) => Ok(v + 1), // making an error on purpose to fail the build
 				Err(err) => Err(RpcError {
 					code: 1,
 					message: err,
