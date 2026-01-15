@@ -165,7 +165,7 @@ mod zela {
 			let rpc = RpcClient::new();
 
 			match Self::run(params, &rpc).await {
-				Ok(v) => Ok(v + 1), // making an error on purpose to fail the build
+				Ok(v) => Ok(v),
 				Err(err) => Err(RpcError {
 					code: 1,
 					message: err,
