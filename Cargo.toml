@@ -1,8 +1,8 @@
 [workspace]
-members = ["block_time","hello_world"]
+members = ["block_time","hello_world", "priority_fees"]
 resolver = "3"
 
 [workspace.dependencies]
-zela-std = { git = "https://github.com/Zela-xyz/zela-std.git", rev = "e5465e0e60ae6b690664408dbdd885fcdb867eab" }
+zela-std = { git = "https://github.com/Zela-io/zela-std.git", rev = "e5465e0e60ae6b690664408dbdd885fcdb867eab" }
 serde = { version = "1.0.228", features = ["derive"] }
 log = { version = "0.4" }
