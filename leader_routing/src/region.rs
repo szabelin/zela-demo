@@ -5,13 +5,16 @@
 
 use serde::Serialize;
 
-/// The four Zela server regions.
+/// Zela server regions.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
 pub enum Region {
     Frankfurt,
     Dubai,
     NewYork,
     Tokyo,
+    /// Unknown location - validator could not be geolocated.
+    /// Routes to Frankfurt as default (38% of validators are in EU).
+    Unknown,
 }
 
 impl Region {
@@ -29,6 +32,16 @@ impl Region {
             Region::Dubai => "Middle East/Dubai",
             Region::NewYork => "North America/New York",
             Region::Tokyo => "Asia/Tokyo",
+            Region::Unknown => "UNKNOWN",
+        }
+    }
+
+    /// Get the routing destination for this region.
+    /// Unknown routes to Frankfurt as default.
+    pub fn routing_destination(&self) -> Region {
+        match self {
+            Region::Unknown => Region::Frankfurt,
+            other => *other,
         }
     }
 }
@@ -40,6 +53,7 @@ impl std::fmt::Display for Region {
             Region::Dubai => write!(f, "Dubai"),
             Region::NewYork => write!(f, "NewYork"),
             Region::Tokyo => write!(f, "Tokyo"),
+            Region::Unknown => write!(f, "Unknown"),
         }
     }
 }
@@ -51,6 +65,7 @@ impl From<u8> for Region {
             1 => Region::Dubai,
             2 => Region::NewYork,
             3 => Region::Tokyo,
+            4 => Region::Unknown,
             _ => Region::DEFAULT,
         }
     }
@@ -66,12 +81,14 @@ mod tests {
         assert_eq!(Region::Dubai.to_string(), "Dubai");
         assert_eq!(Region::NewYork.to_string(), "NewYork");
         assert_eq!(Region::Tokyo.to_string(), "Tokyo");
+        assert_eq!(Region::Unknown.to_string(), "Unknown");
     }
 
     #[test]
     fn test_geo_label() {
         assert_eq!(Region::Frankfurt.geo_label(), "Europe/Frankfurt");
         assert_eq!(Region::Tokyo.geo_label(), "Asia/Tokyo");
+        assert_eq!(Region::Unknown.geo_label(), "UNKNOWN");
     }
 
     #[test]
@@ -80,6 +97,16 @@ mod tests {
         assert_eq!(Region::from(1), Region::Dubai);
         assert_eq!(Region::from(2), Region::NewYork);
         assert_eq!(Region::from(3), Region::Tokyo);
+        assert_eq!(Region::from(4), Region::Unknown);
         assert_eq!(Region::from(99), Region::DEFAULT);
+    }
+
+    #[test]
+    fn test_routing_destination() {
+        // Known regions route to themselves
+        assert_eq!(Region::Frankfurt.routing_destination(), Region::Frankfurt);
+        assert_eq!(Region::Tokyo.routing_destination(), Region::Tokyo);
+        // Unknown routes to Frankfurt
+        assert_eq!(Region::Unknown.routing_destination(), Region::Frankfurt);
     }
 }
