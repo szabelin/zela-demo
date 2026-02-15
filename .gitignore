@@ -1,2 +1,4 @@
 target
 .envrc
+.DS_Store
+.idea/
