@@ -1,0 +1,38 @@
+[package]
+name = "leader_routing"
+version = "0.1.0"
+edition = "2021"
+description = "Zela procedure for leader-aware routing to minimize transaction latency"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# Zela SDK
+zela-std = { git = "https://github.com/Zela-io/zela-std.git", rev = "e5465e0e60ae6b690664408dbdd885fcdb867eab" }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+rkyv = "0.7"
+
+# PHF for O(1) lookups
+phf = { version = "0.11", features = ["macros"] }
+
+# Utilities
+hex = "0.4"
+log = "0.4"
+
+[build-dependencies]
+# Build-time codegen
+phf_codegen = "0.11"
+rkyv = "0.7"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[dev-dependencies]
+# Testing
+tokio = { version = "1", features = ["rt", "macros"] }
+serde_json = "1.0"
+
+[features]
+default = []
