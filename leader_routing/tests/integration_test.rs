@@ -19,7 +19,7 @@ const SAMPLE_SIZE: usize = 20;
 const MIN_MATCH_RATE: f64 = 0.8; // 80% - allows for minor timing differences
 
 /// Minimum acceptable geo coverage (non-Unknown regions)
-const MIN_GEO_COVERAGE: f64 = 0.9; // 90% of validators should have known region
+const MIN_GEO_COVERAGE: f64 = 0.8; // 80% - allows for new validators not yet in geo data
 
 mod helpers {
     use super::*;

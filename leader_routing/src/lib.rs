@@ -57,17 +57,17 @@ pub struct Input {
 /// Debug information for verify mode.
 #[derive(Serialize, Debug)]
 pub struct DebugInfo {
-    /// Slot from precomputed calculation.
+    /// Slot from precomputed calculation (system time based).
     pub precomputed_slot: u64,
     /// Slot from live RPC.
     pub rpc_slot: u64,
-    /// Whether slots match.
-    pub slots_match: bool,
-    /// Leader from precomputed lookup.
+    /// Slot drift (rpc - precomputed). Positive = RPC ahead.
+    pub slot_drift: i64,
+    /// Leader from precomputed schedule for rpc_slot.
     pub precomputed_leader: Option<String>,
-    /// Leader from RPC getSlotLeaders.
+    /// Leader from RPC getSlotLeaders for rpc_slot.
     pub rpc_leader: Option<String>,
-    /// Whether leaders match.
+    /// Whether leaders match (for the same rpc_slot).
     pub leaders_match: bool,
 }
 
@@ -182,24 +182,30 @@ async fn run_rpc() -> Result<Output, RpcError<()>> {
 }
 
 /// Verify mode: run both and compare (testing).
+///
+/// Compares precomputed schedule against live RPC for the SAME slot:
+/// 1. Get current slot from RPC (authoritative)
+/// 2. Look up leader for that slot in precomputed schedule
+/// 3. Get leader for that slot from RPC
+/// 4. Compare: does our schedule match RPC?
 async fn run_verify() -> Result<Output, RpcError<()>> {
     let client = RpcClient::new();
 
-    // 1. Precomputed slot
+    // 1. Precomputed slot (from system time)
     let precomputed_slot = epoch::current_slot();
 
-    // 2. RPC slot
+    // 2. RPC slot (authoritative)
     let rpc_slot = client.get_slot().await.map_err(|e| RpcError {
         code: 500,
         message: format!("RPC get_slot failed: {}", e),
         data: None,
     })?;
 
-    // 3. Precomputed leader
-    let precomputed_leader = schedule::get_leader(precomputed_slot);
+    // 3. Precomputed leader for RPC slot (not precomputed_slot!)
+    let precomputed_leader = schedule::get_leader(rpc_slot);
     let precomputed_leader_hex = precomputed_leader.map(hex::encode);
 
-    // 4. RPC leader
+    // 4. RPC leader for RPC slot
     let rpc_leaders = client
         .get_slot_leaders(rpc_slot, 1)
         .await
@@ -211,13 +217,13 @@ async fn run_verify() -> Result<Output, RpcError<()>> {
     let rpc_leader = rpc_leaders.first();
     let rpc_leader_hex = rpc_leader.map(|p| p.to_string());
 
-    // 5. Compare
-    let slots_match = precomputed_slot == rpc_slot;
+    // 5. Compare leaders for the SAME slot
+    let slot_drift = rpc_slot as i64 - precomputed_slot as i64;
     let leaders_match = precomputed_leader_hex == rpc_leader_hex;
 
     log::info!(
-        "Verify: precomputed_slot={} rpc_slot={} match={}",
-        precomputed_slot, rpc_slot, slots_match
+        "Verify: rpc_slot={} precomputed_slot={} drift={}",
+        rpc_slot, precomputed_slot, slot_drift
     );
     log::info!(
         "Verify: precomputed_leader={:?} rpc_leader={:?} match={}",
@@ -239,7 +245,7 @@ async fn run_verify() -> Result<Output, RpcError<()>> {
         debug: Some(DebugInfo {
             precomputed_slot,
             rpc_slot,
-            slots_match,
+            slot_drift,
             precomputed_leader: precomputed_leader_hex,
             rpc_leader: rpc_leader_hex,
             leaders_match,
@@ -279,9 +285,9 @@ mod tests {
             leader_geo: "Europe/Frankfurt".to_string(),
             closest_region: "Frankfurt".to_string(),
             debug: Some(DebugInfo {
-                precomputed_slot: 12345,
+                precomputed_slot: 12340,
                 rpc_slot: 12345,
-                slots_match: true,
+                slot_drift: 5,
                 precomputed_leader: Some("abc123".to_string()),
                 rpc_leader: Some("abc123".to_string()),
                 leaders_match: true,
@@ -290,7 +296,7 @@ mod tests {
 
         let json = serde_json::to_string(&output).unwrap();
         assert!(json.contains("debug"));
-        assert!(json.contains("slots_match"));
+        assert!(json.contains("slot_drift"));
         assert!(json.contains("leaders_match"));
     }
 
