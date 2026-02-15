@@ -34,6 +34,9 @@ bs58 = "0.5"          # Decode base58 validator pubkeys from leader_geo.json
 # Testing
 tokio = { version = "1", features = ["rt", "macros"] }
 serde_json = "1.0"
+# Integration tests - RPC calls
+reqwest = { version = "0.11", features = ["blocking", "json"] }
+bs58 = "0.5"
 
 [features]
 default = []
