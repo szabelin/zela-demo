@@ -43,6 +43,55 @@
 - Insights graphs should stream new data points
 - Show "live" indicator when connected, "stale" when not
 
+### 4. Generic Error Messages (UX Issue)
+**Problem:** "Error saving procedure" gives no actionable information.
+
+**Observed behavior:**
+- Clicked "Create new procedure" with valid inputs
+- Error toast: "Error saving procedure leader-routing-verify"
+- No details about what failed (validation? build? network? name conflict?)
+- Multiple identical error toasts stack up (5+ in screenshot)
+
+![Error toasts stacking](assets/error-create-procedure.png)
+
+**Suggestion:**
+- Show specific error reason: "Build failed: cargo build error on line X"
+- Or: "Name conflict: procedure already exists"
+- Or: "GitHub access denied: check repository permissions"
+- Deduplicate error toasts (show count instead of stacking)
+
+### 5. No Build Logs Exposed (Feature Request)
+**Problem:** Cannot diagnose why procedure creation fails.
+
+**Observed behavior:**
+- Procedure save fails with generic error
+- "Build errors" section on Insights shows green checkmark (0 errors)
+- No way to see what actually failed during the build
+- Binary size (~17MB) confirmed acceptable by Zela team, so not the issue
+- Completely blocked with no way to debug
+
+![Insights showing 0 build errors but procedure failed](assets/error-insights-page.png)
+
+**Suggestion:**
+- Show build logs in procedure detail page
+- Stream logs in real-time during build
+- Keep last N build attempts with logs for debugging
+
+### 6. Insights Page Empty/Not Loading (Bug)
+**Problem:** Insights graphs show no data.
+
+**Observed behavior:**
+- Insights page shows "Max value: -" and "Min value: -"
+- Graph area is completely empty
+- Unsure if this is expected (no calls yet) or a loading issue
+
+![Empty insights graph](assets/error-toast-stacking.png)
+
+**Suggestion:**
+- Show "No data yet" message instead of empty graph
+- Or show loading spinner if data is being fetched
+- Display explicit time range with data availability
+
 ---
 
 *Feedback from leader_routing development session - 15 Feb 2026*
