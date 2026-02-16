@@ -92,6 +92,48 @@
 - Or show loading spinner if data is being fetched
 - Display explicit time range with data availability
 
+### 7. WASM Build Fails with zstd-sys (Bug)
+**Problem:** Build fails when compiling for `wasm32-wasip2` target.
+
+**Error:**
+```
+error: unable to create target: 'No available targets are compatible with triple "wasm32-unknown-wasip2"'
+zstd-sys C compilation fails
+```
+
+**Root cause:** The `zstd-sys` crate (dependency of zela-std) contains C code that doesn't compile for WASM targets. The clang compiler doesn't support `wasm32-wasip2` triple for C compilation.
+
+**Suggestion:**
+- Use pure-Rust zstd implementation (zstd-rs with pure feature)
+- Or exclude zstd dependency for WASM builds
+- This blocks any procedure with complex dependencies from deploying
+
+### 8. Large Precomputed Data in Git (Architecture Issue)
+**Problem:** 17MB of precomputed data (PHF maps) must be committed to repo for each deployment.
+
+**Issues:**
+- Git repos grow large with each epoch refresh (~every 2 days)
+- GitHub has size limits and slows down with large files
+- Data is environment-specific, not source code
+
+**Suggestion:**
+- Provide local/cloud storage for build artifacts
+- Support build-time data fetching (e.g., from S3, GCS)
+- Or provide a data layer API that procedures can call
+- Keep code repo lightweight, data separate
+
+### 9. Weekend Downtime (Reliability Issue)
+**Problem:** Platform appears to have issues/downtime on weekends.
+
+**Observed behavior:**
+- Procedure creation fails with generic errors
+- No status page or incident communication visible
+
+**Suggestion:**
+- Provide status page (e.g., status.zela.io)
+- Alert users to planned maintenance
+- Consider 24/7 support for production users
+
 ---
 
 *Feedback from leader_routing development session - 15 Feb 2026*
