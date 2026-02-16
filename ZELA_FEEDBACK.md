@@ -92,21 +92,18 @@
 - Or show loading spinner if data is being fetched
 - Display explicit time range with data availability
 
-### 7. WASM Build Fails with zstd-sys (Bug)
-**Problem:** Build fails when compiling for `wasm32-wasip2` target.
+### 7. Local WASM Build Requires wasi-sdk (Documentation)
+**Problem:** Local builds for `wasm32-wasip2` fail without proper setup.
 
-**Error:**
-```
-error: unable to create target: 'No available targets are compatible with triple "wasm32-unknown-wasip2"'
-zstd-sys C compilation fails
-```
-
-**Root cause:** The `zstd-sys` crate (dependency of zela-std) contains C code that doesn't compile for WASM targets. The clang compiler doesn't support `wasm32-wasip2` triple for C compilation.
+**Solution (from Zela team):**
+- Install wasi-sdk: see `shell.nix` line 6
+- Set env vars: `CC_wasm32_wasip2` and `WASI_SYSROOT` (shell.nix lines 20-21)
+- Or use `nix-shell` which sets this up automatically
+- Zela builder already includes wasi-sdk, so deploys work
 
 **Suggestion:**
-- Use pure-Rust zstd implementation (zstd-rs with pure feature)
-- Or exclude zstd dependency for WASM builds
-- This blocks any procedure with complex dependencies from deploying
+- Document wasi-sdk requirement in getting started guide
+- Add troubleshooting section for common build errors
 
 ### 8. Large Precomputed Data in Git (Architecture Issue)
 **Problem:** 17MB of precomputed data (PHF maps) must be committed to repo for each deployment.

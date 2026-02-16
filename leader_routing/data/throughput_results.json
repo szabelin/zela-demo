@@ -1,0 +1,14 @@
+{
+  "duration_secs": 300,
+  "precomputed": {
+    "calls": 2242973847,
+    "throughput": 7474719.295029104
+  },
+  "rpc": {
+    "calls": 16245,
+    "throughput": 54.11252339483111
+  },
+  "speedup": 138132.89098514113,
+  "timestamp": "2026-02-16T18:28:30.496418+00:00",
+  "workers": 10
+}
