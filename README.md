@@ -169,6 +169,10 @@ Results persisted to:
 - `leader_routing/data/throughput_results.json` - Leader vs RPC throughput
 - `leader_routing/data/accuracy_results.json` - Accuracy and leader-only benchmarks
 
+## Future Improvements
+
+- **Build-time RPC fetch**: Modify `build.rs` to fetch the leader schedule directly from Solana RPC during compilation, eliminating the need to commit the 65MB `schedule.json` file. Would add `reqwest` to build-dependencies and call `getLeaderSchedule` at build time.
+
 ## License
 
 MIT
